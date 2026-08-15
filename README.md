@@ -24,6 +24,12 @@ list SQL queries, write generated files to disk or send data to an external serv
 - `ZipArchive` and Dolibarr's bundled PhpSpreadsheet for XLSX output. CSV output
   remains available without XLSX support.
 
+## Download
+
+Download the latest installable ZIP from the GitHub Releases page:
+
+https://github.com/ergocogn/dolibarr-exportlistes/releases/latest
+
 ## Installation
 
 Install the module in either supported external-module location:
