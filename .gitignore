@@ -1,0 +1,10 @@
+build/
+module_*.zip
+.env
+node_modules/
+playwright-report/
+test-results/
+downloads/
+auth/
+.auth/
+.playwright-local/

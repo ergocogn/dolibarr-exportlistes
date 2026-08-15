@@ -1,4 +1,14 @@
 <?php
+/* Copyright (C) 2026       ergoCogn sàrl
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ */
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonhookactions.class.php';
 require_once dol_buildpath('/exportlistes/lib/exportlistes.lib.php');
@@ -15,7 +25,7 @@ require_once dol_buildpath('/exportlistes/lib/exportlistes.lib.php');
  * visible columns and the data rows currently on screen, then POSTs the
  * dataset to public/export.php which streams it back as CSV or XLSX.
  *
- * No SQL adapters, no session token, no contextpage mapping. Works on any
+ * No SQL adapters, no server-side list query replay. Works on any
  * Dolibarr list (core or third-party module) without configuration.
  */
 class ActionsExportlistes extends CommonHookActions
@@ -97,7 +107,7 @@ class ActionsExportlistes extends CommonHookActions
      */
     private function renderButton($contextpage, $showCsv, $showXlsx, $langs)
     {
-        $exportUrl  = DOL_URL_ROOT.'/custom/exportlistes/public/export.php';
+        $exportUrl  = dol_buildpath('/exportlistes/public/export.php', 1);
         $csrf       = function_exists('currentToken') ? currentToken() : (function_exists('newToken') ? newToken() : '');
         $btnLabel   = dol_escape_htmltag($langs->trans('ExportListButton'));
         $csvLabel   = dol_escape_htmltag($langs->trans('ExportCSV'));
@@ -105,13 +115,19 @@ class ActionsExportlistes extends CommonHookActions
         // For JS string literals we use json_encode with JSON_HEX_TAG so that
         // any embedded "</script>" sequences are rendered safe inside <script>.
         $jsFlags    = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE;
-        $emptyMsgJs = json_encode((string) $langs->trans('ExportListEmpty'), $jsFlags);
-        $errorMsgJs = json_encode((string) $langs->trans('ExportListError'), $jsFlags);
+        $emptyMsg = method_exists($langs, 'transnoentitiesnoconv') ? $langs->transnoentitiesnoconv('ExportListEmpty') : $langs->trans('ExportListEmpty');
+        $errorMsg = method_exists($langs, 'transnoentitiesnoconv') ? $langs->transnoentitiesnoconv('ExportListError') : $langs->trans('ExportListError');
+        $emptyMsgJs = json_encode((string) $emptyMsg, $jsFlags);
+        $errorMsgJs = json_encode((string) $errorMsg, $jsFlags);
         $contextJs  = json_encode((string) $contextpage, $jsFlags);
         $exportJs   = json_encode($exportUrl, $jsFlags);
         $csrfJs     = json_encode((string) $csrf, $jsFlags);
 
-        $uid = 'exp_'.bin2hex(random_bytes(6));
+        try {
+            $uid = 'exp_'.bin2hex(random_bytes(6));
+        } catch (Exception $e) {
+            $uid = 'exp_'.str_replace('.', '', uniqid('', true));
+        }
 
         $out  = '<span id="'.$uid.'_wrap" class="exportlistes-wrap" style="display:none;position:relative;white-space:nowrap;vertical-align:middle">';
 
@@ -162,6 +178,17 @@ class ActionsExportlistes extends CommonHookActions
         $out .= 'var CTX='.$contextJs.';';
         $out .= 'var EMPTY_MSG='.$emptyMsgJs.';';
         $out .= 'var ERROR_MSG='.$errorMsgJs.';';
+
+        // Prefer Dolibarr's standard jnotify messages over native browser alerts.
+        $out .= 'function notify(msg,type){';
+        $out .= 'if(window.jQuery&&typeof window.jQuery.jnotify==="function"){window.jQuery.jnotify(msg,type||"warning",true,{remove:function(){}});return;}';
+        $out .= 'var box=document.createElement("div");';
+        $out .= 'box.className=(type==="error"?"error":"warning")+" exportlistes-notification";';
+        $out .= 'box.style.position="fixed";box.style.top="64px";box.style.right="20px";box.style.zIndex="10000";box.style.maxWidth="520px";';
+        $out .= 'box.textContent=msg;';
+        $out .= 'document.body.appendChild(box);';
+        $out .= 'setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},6000);';
+        $out .= '}';
 
         // Place wrap before the pagination limit control, in the page header bar.
         $out .= 'function place(){';
@@ -329,8 +356,8 @@ class ActionsExportlistes extends CommonHookActions
 
         // ------- POST dataset to export.php -----------------------------
         $out .= 'function doExport(fmt){';
-        $out .= 'var data=null;try{data=gather();}catch(e){alert(ERROR_MSG);return;}';
-        $out .= 'if(!data||!data.headers.length||!data.rows.length){alert(EMPTY_MSG);return;}';
+        $out .= 'var data=null;try{data=gather();}catch(e){notify(ERROR_MSG,"error");return;}';
+        $out .= 'if(!data||!data.headers.length||!data.rows.length){notify(EMPTY_MSG,"warning");return;}';
         $out .= 'var f=document.createElement("form");';
         $out .= 'f.method="POST";f.action=EXPORT_URL;f.style.display="none";';
         $out .= 'function add(n,v){var i=document.createElement("input");i.type="hidden";i.name=n;i.value=v;f.appendChild(i);}';

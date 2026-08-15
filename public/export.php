@@ -1,4 +1,14 @@
 <?php
+/* Copyright (C) 2026       ergoCogn sàrl
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ */
 
 // Bootstrap constants must be defined before main.inc.php.
 define('NOTOKENRENEWAL', 1); // CSRF token is validated manually below.
@@ -6,7 +16,37 @@ define('NOREQUIREMENU', 1);
 define('NOREQUIREHTML', 1);
 define('NOREQUIREAJAX', 1);
 
-require dirname(__FILE__).'/../../../main.inc.php';
+// Load Dolibarr environment.
+$res = 0;
+if (!$res && !empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) {
+    $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"]."/main.inc.php";
+}
+$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME'];
+$tmp2 = realpath(__FILE__);
+$i = strlen($tmp) - 1;
+$j = strlen($tmp2) - 1;
+while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) {
+    $i--;
+    $j--;
+}
+if (!$res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1))."/main.inc.php")) {
+    $res = @include substr($tmp, 0, ($i + 1))."/main.inc.php";
+}
+if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc.php")) {
+    $res = @include dirname(substr($tmp, 0, ($i + 1)))."/main.inc.php";
+}
+if (!$res && file_exists("../main.inc.php")) {
+    $res = @include "../main.inc.php";
+}
+if (!$res && file_exists("../../main.inc.php")) {
+    $res = @include "../../main.inc.php";
+}
+if (!$res && file_exists("../../../main.inc.php")) {
+    $res = @include "../../../main.inc.php";
+}
+if (!$res) {
+    die("Include of main fails");
+}
 
 require_once dol_buildpath('/exportlistes/lib/exportlistes.lib.php');
 require_once dol_buildpath('/exportlistes/class/exportservice.class.php');
@@ -64,8 +104,9 @@ if ($format === 'xlsx' && !getDolGlobalInt('EXPORTLISTES_ENABLE_XLSX', 1)) {
 
 // 8. Inputs.
 $contextpage = GETPOST('contextpage', 'aZ09');
-// Raw JSON payload: do NOT use GETPOST sanitizers (they would mangle <, >, & in cells).
-$payload = isset($_POST['payload']) ? (string) $_POST['payload'] : '';
+// Raw JSON payload: GETPOST('payload', 'none') can alter large JSON form values on Dolibarr 23.
+// Use PHP's raw POST filter after POST/auth/rights/CSRF checks, then validate strictly in the service.
+$payload = filter_has_var(INPUT_POST, 'payload') ? (string) filter_input(INPUT_POST, 'payload', FILTER_UNSAFE_RAW) : '';
 
 // 9. Allow generous time for XLSX writing on big lists, but keep the cap finite.
 @set_time_limit(120);

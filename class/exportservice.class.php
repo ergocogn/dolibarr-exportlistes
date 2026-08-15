@@ -1,4 +1,14 @@
 <?php
+/* Copyright (C) 2026       ergoCogn sàrl
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ */
 
 require_once dol_buildpath('/exportlistes/lib/exportlistes.lib.php');
 
@@ -136,8 +146,8 @@ class ExportListesService
             $s = html_entity_decode($s, ENT_QUOTES | ENT_HTML5, 'UTF-8');
         }
 
-        // Force UTF-8.
-        if (!mb_check_encoding($s, 'UTF-8')) {
+        // Force UTF-8 when mbstring is available.
+        if (function_exists('mb_check_encoding') && function_exists('mb_convert_encoding') && !mb_check_encoding($s, 'UTF-8')) {
             $converted = mb_convert_encoding($s, 'UTF-8', 'ISO-8859-1');
             if ($converted !== false) {
                 $s = $converted;
@@ -154,7 +164,11 @@ class ExportListesService
 
         // Length cap.
         if ($maxLen > 0 && strlen($s) > $maxLen) {
-            $s = mb_strcut($s, 0, $maxLen, 'UTF-8');
+            if (function_exists('mb_strcut')) {
+                $s = mb_strcut($s, 0, $maxLen, 'UTF-8');
+            } else {
+                $s = substr($s, 0, $maxLen);
+            }
         }
 
         // CSV/XLSX formula injection protection: prefix a single quote when the

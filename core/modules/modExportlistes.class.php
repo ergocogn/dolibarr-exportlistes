@@ -1,5 +1,14 @@
 <?php
-/* Copyright (C) 2026 */
+/* Copyright (C) 2026       ergoCogn sàrl
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ */
 
 include_once DOL_DOCUMENT_ROOT.'/core/modules/DolibarrModules.class.php';
 
@@ -16,13 +25,15 @@ class modExportlistes extends DolibarrModules
     public function __construct($db)
     {
         $this->db = $db;
-        $this->numero = 106500;
+        $this->numero = 193920;
         $this->rights_class = 'exportlistes';
         $this->family = 'tools';
         $this->module_position = '90';
         $this->name = preg_replace('/^mod/i', '', get_class($this));
-        $this->description = 'Export filtered list results to CSV/XLSX without pagination limit';
-        $this->version = '0.1.0';
+        $this->description = 'Export visible Dolibarr list rows to CSV/XLSX';
+        $this->version = '1.0.0';
+        $this->editor_name = 'DoliHub - ergoCogn sàrl';
+        $this->editor_url = 'https://www.dolihub.ch/';
         $this->const_name = 'MAIN_MODULE_'.strtoupper($this->name);
         $this->picto = 'generic';
 
@@ -38,7 +49,7 @@ class modExportlistes extends DolibarrModules
         $this->conflictwith = array();
         $this->langfiles = array('exportlistes@exportlistes');
         $this->phpmin = array(7, 4);
-        $this->need_dolibarr_version = array(22, 0);
+        $this->need_dolibarr_version = array(23, 0);
 
         $this->const = array(
             array('EXPORTLISTES_ENABLE_CSV', 'yesno', '1', 'Enable CSV export', 0, 'current'),
@@ -52,13 +63,13 @@ class modExportlistes extends DolibarrModules
         $this->rights = array();
         $r = 0;
 
-        $this->rights[$r][0] = 1065001;
+        $this->rights[$r][0] = 1939201;
         $this->rights[$r][1] = 'Use list export button';
         $this->rights[$r][4] = 'use';
         $this->rights[$r][5] = '';
         $r++;
 
-        $this->rights[$r][0] = 1065002;
+        $this->rights[$r][0] = 1939202;
         $this->rights[$r][1] = 'Configure export module';
         $this->rights[$r][4] = 'admin';
         $this->rights[$r][5] = '';
