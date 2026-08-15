@@ -1,0 +1,13 @@
+ExportListesSetup=Export List Setup
+ExportListButton=Export
+ExportCSV=CSV
+ExportXLSX=Excel (XLSX)
+EnableCSV=Enable CSV export
+EnableXLSX=Enable XLSX export
+MaxRows=Maximum rows (0 = unlimited)
+MaxPayloadBytes=Maximum payload size in bytes (0 = unlimited, default 16 MB)
+CsvDelimiter=CSV delimiter
+CsvBom=Add UTF-8 BOM to CSV
+ExportContextNotSupported=Unsupported list context
+ExportListEmpty=No data to export on this page. Use the search filter and the pagination selector at the bottom of the list to display the rows you want first.
+ExportListError=An error occurred while reading the list. Reload the page and try again.

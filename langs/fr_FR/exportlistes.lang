@@ -1,0 +1,13 @@
+ExportListesSetup=Configuration Export Listes
+ExportListButton=Exporter
+ExportCSV=CSV
+ExportXLSX=Excel (XLSX)
+EnableCSV=Activer export CSV
+EnableXLSX=Activer export XLSX
+MaxRows=Nombre max de lignes (0 = illimité)
+MaxPayloadBytes=Taille max du payload en octets (0 = illimité, défaut 16 Mo)
+CsvDelimiter=Séparateur CSV
+CsvBom=Ajouter le BOM UTF-8 au CSV
+ExportContextNotSupported=Contexte de liste non supporté
+ExportListEmpty=Aucune donnée à exporter sur cette page. Utilisez le filtre de recherche puis ajustez la pagination en bas de liste pour afficher toutes les lignes voulues.
+ExportListError=Une erreur est survenue lors de la lecture de la liste. Rechargez la page puis réessayez.
