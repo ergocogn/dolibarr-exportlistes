@@ -1,11 +1,8 @@
 # ExportListes
 
-ExportListes is a Dolibarr module that adds a CSV/XLSX export action to list pages.
-It exports the visible rows and columns currently rendered in the browser, after the
-user has applied filters and chosen the desired pagination size.
+ExportListes is a Dolibarr ERP module for exporting filtered list views to CSV and XLSX (Excel). It exports the visible rows and columns after the user has applied filters and selected the desired pagination size.
 
-The module is intentionally lightweight: it does not create database tables, replay
-list SQL queries, write generated files to disk or send data to an external service.
+The module is intentionally lightweight: it does not create database tables, replay list SQL queries, write generated files to disk or send data to an external service.
 
 ## Features
 
@@ -37,8 +34,7 @@ Install the module in either supported external-module location:
 - `htdocs/custom/exportlistes`
 - `htdocs/exportlistes`
 
-Then enable it from **Home > Setup > Modules/Applications** and configure it from
-the module setup page.
+Then enable it from **Home > Setup > Modules/Applications** and configure it from the module setup page.
 
 ## Usage
 
@@ -48,8 +44,7 @@ the module setup page.
 4. Click the export button added near the list controls.
 5. Choose CSV or XLSX, depending on the enabled formats.
 
-ExportListes exports the rows and columns currently visible in the browser. It does
-not export rows hidden on another pagination page.
+ExportListes exports the rows and columns currently visible in the browser. It does not export rows hidden on another pagination page.
 
 ## Configuration
 
@@ -65,9 +60,7 @@ Non-admin users need the module export permission to use the button.
 
 ## Packaging
 
-For DoliStore packaging, the final archive must be named
-`module_exportlistes-1.0.0.zip` and contain the `exportlistes/` directory directly
-at the ZIP root.
+For DoliStore packaging, the final archive must be named `module_exportlistes-1.0.0.zip` and contain the `exportlistes/` directory directly at the ZIP root.
 
 ## Publisher Links
 
@@ -79,18 +72,14 @@ at the ZIP root.
 
 ## Security And Data
 
-ExportListes does not create database tables and does not write runtime files under
-`DOL_DOCUMENT_ROOT`. It streams exports directly to the authenticated user.
+ExportListes does not create database tables and does not write runtime files under `DOL_DOCUMENT_ROOT`. It streams exports directly to the authenticated user.
 
-The export endpoint accepts a raw JSON payload because exported cells may contain
-characters such as `<`, `>` and `&`. The payload is still protected by Dolibarr
-authentication, module rights, POST-only access, CSRF validation, size limits,
-JSON structure checks, cell normalization and CSV/XLSX formula neutralization.
+The export endpoint accepts a raw JSON payload because exported cells may contain characters such as `<`, `>` and `&`. The payload is still protected by Dolibarr
+authentication, module rights, POST-only access, CSRF validation, size limits, JSON structure checks, cell normalization and CSV/XLSX formula neutralization.
 
 ## Third-Party Code
 
-This repository does not vendor third-party libraries. It relies on Dolibarr APIs
-and, when available, Dolibarr's bundled PhpSpreadsheet installation. See
+This repository does not vendor third-party libraries. It relies on Dolibarr APIs and, when available, Dolibarr's bundled PhpSpreadsheet installation. See
 `docs/THIRD_PARTY_NOTICES.md`.
 
 ## License
